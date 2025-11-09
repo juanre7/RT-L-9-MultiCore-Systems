@@ -36,3 +36,23 @@ Optionally add `vTaskDelay(1)` or `taskYIELD()` inside long loops to prevent sta
 * The banner says Priority Inheritance Demo, but the sketch is demonstrating core pinning, not priority inheritance.
 * On ESP32 S3 the core IDs are still 0 and 1. Using `pro_cpu` and `app_cpu` as aliases is fine even if the names come from the original ESP32.
 
+# Third observation
+
+<img width="954" height="894" alt="image" src="https://github.com/user-attachments/assets/b73116ed-8544-42f2-951a-e8695a5ffdb2" />
+
+
+* Using `tskNO_AFFINITY` lets the scheduler run each task on any core. The log shows Task L printing from Core 0 and Core 1, which confirms migration.
+
+* Task H has higher priority than Task L. You see multiple consecutive prints from Task H on Core 1 because it preempts the lower priority task whenever it is ready.
+
+* The scheduler tends to keep the higher priority task on the same core in practice, while the lower priority task bounces between cores as capacity opens up.
+
+* `hog_delay()` is a busy wait, so it does not yield voluntarily. Preemption at the RTOS tick still occurs, which is why both tasks make progress and print.
+
+* CPU usage is very high in the simulator due to the busy wait. If you change to `vTaskDelay(pdMS_TO_TICKS(200))`, the CPU load will drop and task interaction will be clearer.
+
+* The banner text says “Priority Inheritance Demo”, but the sketch does not use mutexes or priority inheritance. It is a core affinity and priority example.
+
+* Concurrent `Serial.print` calls are unsynchronized. The driver usually serializes access, so lines appear intact, but the order is nondeterministic.
+
+* With no affinity, `pro_cpu` and `app_cpu` are now unused, as is `timestamp` inside each task. You can remove them to avoid warnings.

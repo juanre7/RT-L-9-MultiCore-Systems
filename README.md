@@ -22,3 +22,17 @@ vTaskDelay(time_hog / portTICK_PERIOD_MS);  // yields the CPU
 ```
 
 Optionally add `vTaskDelay(1)` or `taskYIELD()` inside long loops to prevent starvation when experimenting with busy waits.
+
+# Second observation
+
+<img width="955" height="896" alt="{2F2D7216-539A-4EA0-A214-819468DE8CF4}" src="https://github.com/user-attachments/assets/9f766183-d8f1-4718-a35b-78202800d0f1" />
+
+
+* Output shows Task L on Core 0 and Task H on Core 1. CPU affinity is working.
+* The 99% load matches the busy wait in `hog_delay`, which keeps both cores spinning.
+* Message order is not strictly alternating. Seeing Task H twice in a row is normal due to higher priority plus Serial buffering.
+* The 200 ms delay is approximate. The nested loops depend on clock speed, so timing on the S3 will drift.
+* If you want lower load and more regular logs, replace `hog_delay(time_hog)` with `vTaskDelay(pdMS_TO_TICKS(time_hog))`.
+* The banner says Priority Inheritance Demo, but the sketch is demonstrating core pinning, not priority inheritance.
+* On ESP32 S3 the core IDs are still 0 and 1. Using `pro_cpu` and `app_cpu` as aliases is fine even if the names come from the original ESP32.
+

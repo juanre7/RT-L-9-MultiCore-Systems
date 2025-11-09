@@ -1,5 +1,8 @@
 # First observation
 
+<img width="959" height="898" alt="image" src="https://github.com/user-attachments/assets/b0c5b134-951d-4543-a07d-4665697330ab" />
+
+
 * Both tasks are pinned to the same core: `pro_cpu = 0`. That is why the log only shows Core 0. Despite the title, there is no actual dual-core execution.
 * Priorities: `Task H` has priority 2 and `Task L` has priority 1. In FreeRTOS, higher number means higher priority. Since neither task ever blocks, `Task H` preempts almost all the time. The screenshot matches this: one print from Task L, then repeated prints from Task H.
 * `hog_delay()` is a busy wait. It wastes CPU cycles, timing is not accurate, and it prevents the task from yielding.
